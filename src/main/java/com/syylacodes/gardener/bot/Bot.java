@@ -21,17 +21,20 @@ public class Bot {
     private final Config config;
     private final HashMap<Long, Party> parties = new HashMap<>();
     private final HashMap<Long, Room> rooms = new HashMap<>();
+    private final Queue queue;
     private JDA jda;
 
-    public Bot(Config config) throws LoginException {
+    public Bot(Config config, Queue queue) throws LoginException {
         jda = JDABuilder
                 .createDefault(config.getToken())
                 .addEventListeners(new Listener(config, this))
                 .setActivity(Activity.watching("people water their gardens."))
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                .enableIntents(GatewayIntent.GUILD_PRESENCES)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .build();
         this.config = config;
+        this.queue = queue;
     }
 
     public void createParty(Long userId, String message, MessageReceivedEvent event) {

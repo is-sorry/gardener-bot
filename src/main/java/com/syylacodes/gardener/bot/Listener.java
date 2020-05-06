@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.springframework.stereotype.Component;
 
@@ -77,7 +78,8 @@ public class Listener extends ListenerAdapter {
             if (party.getBotMessage() == event.getMessageIdLong())
                 if (event.getReactionEmote().getIdLong() == config.getEmoji()) {
                     if (event.getUserIdLong() != party.getHostId()) {
-                        party.addGuest(event.getUserIdLong());
+                        if (!party.getGuestsId().contains(event.getUserIdLong()))
+                            party.addGuest(event.getUserIdLong());
                     } else {
                         //TODO:embed
                         event.getChannel().sendMessage("You can't water for yourself, silly!").queue();
@@ -85,5 +87,22 @@ public class Listener extends ListenerAdapter {
                 }
         });
 
+    }
+
+    @Override
+    public void onMessageReactionRemove(@Nonnull MessageReactionRemoveEvent event) {
+        HashMap<Long, Party> parties = bot.getParties();
+        if (event.getUserIdLong() == bot.getJda().getSelfUser().getIdLong())
+            return;
+
+        parties.forEach((aLong, party) -> {
+            if (party.getBotMessage() == event.getMessageIdLong())
+                if (event.getReactionEmote().getIdLong() == config.getEmoji()) {
+                    if (event.getUserIdLong() != party.getHostId()) {
+                        if (party.getGuestsId().contains(event.getUserIdLong()))
+                            party.removeGuest(event.getUserIdLong());
+                    }
+                }
+        });
     }
 }

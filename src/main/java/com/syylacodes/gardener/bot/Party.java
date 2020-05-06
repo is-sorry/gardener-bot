@@ -46,6 +46,8 @@ public class Party {
 
     public void removeGuest(Long id) {
         guestsId.remove(id);
+        refreshPartyMessage();
+
     }
 
     public void manageParty() {
