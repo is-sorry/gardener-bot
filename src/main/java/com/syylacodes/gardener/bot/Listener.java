@@ -3,7 +3,6 @@ package com.syylacodes.gardener.bot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -12,7 +11,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import java.util.EnumSet;
 import java.util.HashMap;
 
 @Slf4j
@@ -35,14 +33,13 @@ public class Listener extends ListenerAdapter {
                                     guild
                                             .createTextChannel("Room " + i)
                                             .setParent(category)
-                                            .addPermissionOverride(guild.getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL))
                                             .queue();
 
                             }
                     );
 
         guild.getCategoriesByName("watering rooms", true).get(0)
-                .getChannels().forEach(guildChannel -> bot.getRooms().add(new Room(guildChannel.getIdLong())));
+                .getChannels().forEach(guildChannel -> bot.getRooms().put(guildChannel.getIdLong(), new Room(guildChannel.getIdLong())));
     }
 
 
